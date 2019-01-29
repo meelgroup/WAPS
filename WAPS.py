@@ -260,11 +260,11 @@ def main():
             dDNNF = inputFile.split("/")[-1] + ".nnf"
             cmd = "/usr/bin/time --verbose ./d4 /tmp/" + inputFile.split("/")[-1] + ".tmp " + " -out=" + dDNNF
             if(sampler.isSamplingSetPresent):
-                cmd = "/usr/bin/time --verbose ./dsharp -cs 2000 -pvarsfile "+ "/tmp/" + inputFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + inputFile.split("/")[-1]+".tmp" 
+                cmd = "/usr/bin/time --verbose ./Dsharp_PCompile -cs 2000 -pvarsfile "+ "/tmp/" + inputFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + inputFile.split("/")[-1]+".tmp" 
 
             start = time.time()
             os.system(cmd)
-            print("The time taken by D4/Dsharp is ", time.time() - start)
+            print("The time taken by D4/Dsharp_PCompile is ", time.time() - start)
     if dDNNF:
         start = time.time()
         sampler.parse(dDNNF)

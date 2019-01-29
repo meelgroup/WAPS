@@ -3,10 +3,16 @@ WAPS, Weighted And Projected Sampler, generates samples on a sampling set confor
 
 ## Installation
 ```bash
-chmod +x install.sh
-./install.sh
+sudo apt-get install graphviz
+sudo apt-get install libgmp-dev
+sudo apt-get install libmpfr-dev
+sudo apt-get install libmpc-dev
+pip install -r requirements.txt
+wget http://www.cril.univ-artois.fr/KC/ressources/d4
+chmod u+x d4
 ```
-For now, [D4 compiler](http://www.cril.univ-artois.fr/KC/d4.html) and [Dsharp](https://bitbucket.org/haz/dsharp) (modified for our use case, see the "PCompile" procedure) are included as default for compiling CNF to d-DNNF. Any other compiler can be easily used with slight modifications.
+
+For now, [D4 compiler](http://www.cril.univ-artois.fr/KC/d4.html) and [Dsharp_PCompile](https://bitbucket.org/haz/dsharp) (modified for our use case, see the "PCompile" procedure) are included as default for compiling CNF to d-DNNF. Any other compiler can be easily used with slight modifications.
 
 ## Running WAPS
 You can run WAPS by using 'WAPS.py' Python script. A simple invocation looks as follows:
@@ -32,7 +38,7 @@ Also, WAPS can output a graphical representation of d-DNNF for the input NNF. In
 Benchmarks can be found [here](https://drive.google.com/open?id=1AQnpPwqJ-3ouwqKGw_VIjqWEHfQCnzBM).
 
 ## Contributors
-  * Rahul Gupta (grahul@cse.iitk.ac.in)
-  * Shubham Sharma (smsharma@cse.iitk.ac.in)
+  * Rahul Gupta (grahul@iitk.ac.in)
+  * Shubham Sharma (smsharma@iitk.ac.in)
   * Subhajit Roy (subhajit@iitk.ac.in)
   * Kuldeep Meel (meel@comp.nus.edu.sg)
