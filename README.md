@@ -15,19 +15,19 @@ chmod u+x bin/d4
 For now, [D4 compiler](http://www.cril.univ-artois.fr/KC/d4.html) and [Dsharp_PCompile](https://bitbucket.org/haz/dsharp) (modified for our use case, see the "PCompile" procedure) are included as default for compiling CNF to d-DNNF. Any other compiler can be easily used with slight modifications.
 
 ## Running WAPS
-You can run WAPS by using 'WAPS.py' Python script present in WAPS directory. A simple invocation looks as follows:
+You can run WAPS by using 'waps.py' Python script present in waps directory. A simple invocation looks as follows:
 ```bash
-python3 WAPS.py <cnffile>
+python3 waps.py <cnffile>
 ```
 The usage instructions and default values to arguments can be found by running
 ```bash
-python3 WAPS.py -h
+python3 waps.py -h
 ```
 ## Weight Format
-WAPS support providing weights in CNF itself apart from being provided separately in a file. A type variable weight is in [0,inf], specified by line starting with 'w' ,literal, and weight separated by space. Later, WAPS normalizes it such that weight(l)+weight(-l)=1 where l is a literal. By default, every variable weight is set to 0.5, if its value is not given in CNF or the weightfile.
+WAPS supports providing weights in CNF itself apart from being provided separately in a file. Weight of a literal is in [0,inf], specified by line starting with 'w',literal, and weight separated by space. Later, WAPS normalizes it such that weight(l)+weight(-l)=1 where l is a literal. While weights for both positive and negative literals should be specified, if weight of only positive literal is specified, waps assumes it to be normalized and assigns weight of negative literal as 1 - weight(l). By default, every literal's weight is set to 0.5, if its value is not given in CNF or the weightfile. 
 
 ## Specifying sampling set
-WAPS support providing sampling set in CNF itself. It is specified by lines starting with 'c ind' ,var indexes separated by space, and ended by 0. If sampling set is not provided, by default, every variable specified in formula is assumed to be a part of sampling set.
+WAPS supports providing sampling set in CNF itself. It is specified by lines starting with 'c ind' ,var indexes separated by space, and ended by 0. If sampling set is not provided, by default, every variable specified in formula is assumed to be a part of sampling set.
 
 ## Output Format
 The output samples are stored in samples.txt by default. Each line of the output consists of a serial number of the sample followed by a satisfying assignment projected on sampling set. The satisfying assignment consists of literals seperated by space. Note that turning random assignment (--randAssign) to 0 can lead to partial assignments in each line. In such cases, the unassigned sampling variables can be chosen to be True or False.
@@ -50,13 +50,13 @@ chmod u+x Dsharp_PCompile
 chmod u+x d4
 sudo mv Dsharp_PCompile /usr/local/bin/
 sudo mv d4 /usr/local/bin/
-pip install WAPS
+pip install waps
 ```
 Please reload your shell so that binaries are accessible via PATH.
 
 A typical usage is as follows:
 ```python
-from WAPS import sampler
+from waps import sampler
 
 sampler = sampler(cnfFile="toy.cnf")
 sampler.compile()
@@ -68,7 +68,7 @@ print(list(samples))
 
 You can find more information on usage by:
 ```python
-from WAPS import sampler
+from waps import sampler
 help(sampler)
 ```
 

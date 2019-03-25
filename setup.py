@@ -8,17 +8,17 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-  name = 'WAPS',
-  packages = ['WAPS'],
-  version = 'v1.0',
+  name = 'waps',
+  packages = ['waps'],
+  version = 'v1.0.2',
   license='MIT',
   description = 'This library can be used to sample satisfying assignments for a CNF/DNF obeying a given literal-weighted weight function and projected upon a given sampling set.',
   long_description=long_description,
   long_description_content_type='text/markdown',
   author = 'Rahul Gupta',
   author_email = 'rahujupiter@gmail.com',
-  url = 'https://github.com/meelgroup/WAPS/',
-  download_url = 'https://github.com/meelgroup/WAPS/archive/v1.0.tar.gz',
+  url = 'https://github.com/meelgroup/waps/',
+  download_url = 'https://github.com/meelgroup/waps/archive/v1.0.2.tar.gz',
   keywords = ['sampling', 'cnf', 'weighted sampling', 'projected sampling', 'dDNNF'],   # Keywords that define your package best
   install_requires=[
           'numpy',
