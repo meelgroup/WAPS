@@ -1,5 +1,5 @@
 # WAPS-Sampler
-WAPS, Weighted And Projected Sampler, generates samples on a sampling set conforming to a weight distribution defined by a literal-weighted weight function. It operates by using a compiled deterministic decomposable negation normal form (d-DNNF) of a CNF. It expects CNF in the DIMACS format and d-DNNF in the same format as that produced by the [C2D compiler](http://reasoning.cs.ucla.edu/c2d/). Is is based on our paper titled "WAPS:Weighted and Projected Sampling" as published in TACAS-2019 conference.
+WAPS, Weighted And Projected Sampler, generates samples on a sampling set conforming to a weight distribution defined by a literal-weighted weight function. It takes CNF in DIMACS format and operates by compiling the CNF to deterministic decomposable negation normal form (d-DNNF). Is is based on our paper titled "[WAPS:Weighted and Projected Sampling](https://www.comp.nus.edu.sg/~meel/Papers/tacas19.pdf)" as published in TACAS-2019 conference.
 
 ## Installation
 ```bash
@@ -24,7 +24,7 @@ The usage instructions and default values to arguments can be found by running
 python3 waps.py -h
 ```
 ## Weight Format
-WAPS supports providing weights in CNF itself apart from being provided separately in a file. Weight of a literal is in [0,inf], specified by line starting with 'w',literal, and weight separated by space. Later, WAPS normalizes it such that weight(l)+weight(-l)=1 where l is a literal. While weights for both positive and negative literals should be specified, if weight of only positive literal is specified, waps assumes it to be normalized and assigns weight of negative literal as 1 - weight(l). By default, every literal's weight is set to 0.5, if its value is not given in CNF or the weightfile. 
+WAPS supports providing weights in CNF itself apart from being provided separately in a file. Weight of a literal is in [0,inf], specified by line starting with 'w',literal, and weight separated by space. Later, WAPS normalizes it such that weight(l)+weight(-l)=1 where l is a literal. While weights for both positive and negative literals should be specified, if weight of only positive literal is specified, waps assumes it to be normalized and assigns weight of negative literal as 1 - weight(l). By default, every literal's weight is set to 0.5 if its value is not given in CNF or the weightfile. Some examples are available in examples/ directory for reference.
 
 ## Specifying sampling set
 WAPS supports providing sampling set in CNF itself. It is specified by lines starting with 'c ind' ,var indexes separated by space, and ended by 0. If sampling set is not provided, by default, every variable specified in formula is assumed to be a part of sampling set.
@@ -84,8 +84,7 @@ title={WAPS: Weighted and Projected Sampling},
 booktitle={Proceedings of Tools and Algorithms for the Construction and Analysis of Systems (TACAS)},
 month={4},
 year={2019},
-code={https://github.com/meelgroup/WAPS},
-abstract={Previous work on applying Knowledge compilation has focused on uniform sampling over all the variables. Since the constraints are written in high level languages such as Verilog, the popular CNF encoding schemes as Tseitin encoding introduces additional auxiliary variables. The resulting CNF formulas are not equivalent but equisatisfiable. In particular, for a formula $G$ specified in high level language we obtain a CNF formula F such that $G (X) = \exists Y F(X,Y)$. This makes one wonder if it is possible to extend Knowledge compilation based techniques to sample over a subset of variables. Furthermore, languages such as Verilog allow specification of weights to user-defined constraints, so there is a need to sample according to the posterior distribution. In this paper, we provide affirmative question to the above two questions: We propose KUS that samples over user defined subset of variables from posterior distribution for a given prior distribution defined over product spaces.},
+note={Given a set of constraints F and a user-defined weight function W on the assignment space, the problem of constrained sampling is to sample satisfying assignments of F conditioned on W. Constrained sampling is a fundamental problem with applications in probabilistic reasoning, synthesis, software and hardware testing. In addition to constrained sampling, we are often interested in projected sampling i.e. sampling over a subset of variables from formula F, thus omitting the auxiliary variables introduced during Tseitin encoding of constraints to F. To tackle these problems, we present a novel technique, called WAPS, which proceeds by sampling in linear time over the size of the formula's d-DNNF, a well studied compiled form. WAPS achieves a geometric speedup of 296x over state-of-the-art weighted and projected sampler WeightGen and its runtime is agnostic to the underlying weight distribution.}
 }
 ```
 
