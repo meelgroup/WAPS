@@ -1,0 +1,19 @@
+DSHARP version 1.0
+
+If you would like the solver to use infinite precision numbers for the counting,
+you must have the GMP library (libgmp-dev) installed. To use the version with GMP,
+copy the Makefile_gmp to Makefile. To compile a static version of Dsharp with gmp, copy Makefile_gmp_static to Makefile.
+Otherwise, copy Makefile_nogmp to Makefile and proceed normally.
+
+To compile this version of DSHARP simply run
+make
+
+Please cite using the following:
+
+@inproceedings{Muise2012,
+    author = {Muise, Christian and McIlraith, Sheila A. and Beck, J. Christopher and Hsu, Eric},
+    booktitle = {Canadian Conference on Artificial Intelligence},
+    title = {{DSHARP: Fast d-DNNF Compilation with sharpSAT}},
+    keywords = {sat, knowledge compilation},
+    year = {2012}
+}
