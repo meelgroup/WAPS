@@ -44,7 +44,7 @@ sudo apt-get install graphviz
 sudo apt-get install libgmp-dev
 sudo apt-get install libmpfr-dev
 sudo apt-get install libmpc-dev
-wget https://github.com/meelgroup/WAPS/master/bin/Dsharp_PCompile
+wget https://github.com/meelgroup/WAPS/raw/master/bin/Dsharp_PCompile
 wget http://www.cril.univ-artois.fr/kc/ressources/d4
 chmod u+x Dsharp_PCompile
 chmod u+x d4
