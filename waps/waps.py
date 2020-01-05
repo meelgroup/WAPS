@@ -34,7 +34,7 @@ from gmpy2 import mpq, mpfr
 import pkg_resources
 
 
-def random_assignment(solution, samplingSet = [], weights=None):
+def random_assignment(solution, samplingSet = [], weights=None, maximum=False, minimum=False):
     '''Takes total number of variables and a partial assignment
     to return a complete assignment'''
     literals = set()
@@ -46,10 +46,22 @@ def random_assignment(solution, samplingSet = [], weights=None):
     for i in samplingSet:
         if i not in literals:
             if weights and i in weights:
-                litchoice = np.random.choice([1, -1], p=[weights[i], 1-weights[i]])
+                if (maximum and weights[i] > 0.5):
+                    litchoice = 1
+                elif (maximum and weights[i] <= 0.5):
+                    litchoice = -1
+                elif (minimum and weights[i] <= 0.5):
+                    litchoice = 1
+                elif (minimum and weights[i] > 0.5):
+                    litchoice = -1
+                else:
+                    litchoice = np.random.choice([1, -1], p=[weights[i], 1-weights[i]])
                 solutionstr += str(litchoice*i)+" "
             else:
-                solutionstr += str(((random.randint(0,1)*2)-1)*i)+" "
+                if (maximum or minimum):
+                    solutionstr += str(i)+" "
+                else:
+                    solutionstr += str(((random.randint(0,1)*2)-1)*i)+" "
         else:
             solutionstr += str(vartolit[i]) + " "
     return solutionstr
@@ -328,7 +340,7 @@ class sampler():
         if randAssign:
             if not self.isSamplingSetPresent:
                 self.samplingSet = list(range(1,self.totalVariables+1))
-            self.samples = map(lambda x: random_assignment(x, samplingSet = self.samplingSet, weights=self.weights), self.samples)
+            self.samples = map(lambda x: random_assignment(x, samplingSet = self.samplingSet, weights=self.weights, maximum=maximum, minimum=minimum), self.samples)
         return self.samples
 
     def save(self, outputFile=None):
@@ -647,7 +659,7 @@ def main():
     sampler.getsamples(sampler.treenodes[-1],np.arange(0,totalsamples))
     print("The time taken by sampling:", time.time()-start)
     if randAssign:
-        sampler.samples = list(map(lambda x: random_assignment(x, samplingSet = sampler.variables, weights=weights), sampler.samples))
+        sampler.samples = list(map(lambda x: random_assignment(x, samplingSet = sampler.variables, weights=weights, maximum=maximum, minimum=minimum), sampler.samples))
     f = open(args.outputfile,"w+")
     for i in range(totalsamples):
         f.write(str(i+1) + ", " + sampler.samples[i] + "\n")
