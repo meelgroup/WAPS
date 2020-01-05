@@ -218,6 +218,9 @@ class sampler():
         '''
         if dDNNFfile:
             self._dDNNFfile = dDNNFfile
+        if (os.stat(self._dDNNFfile).st_size == 0):
+            print("Formula is UNSAT!!!!!")
+            exit()
         with open(self._dDNNFfile) as f:
             treetext = f.readlines()
         nodelen = 0
@@ -427,6 +430,9 @@ class sampler2():
 
     def parse(self,inputnnffile):
         '''Parses the d-DNNF tree to a tree like object'''
+        if (os.stat(inputnnffile).st_size == 0):
+            print("Formula is UNSAT!!!!")
+            exit()
         with open(inputnnffile) as f:
             treetext = f.readlines()
         nodelen = 0
