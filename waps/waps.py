@@ -53,7 +53,7 @@ def random_assignment(solution, samplingSet = [], weights=None):
         else:
             solutionstr += str(vartolit[i]) + " "
     return solutionstr
-       
+
 def normalizeWeights(weights):
     '''
     Normalizes the weights
@@ -87,7 +87,7 @@ def fetchWeights(weightFile):
     return weights
 
 def conditionWeights(lits, weights):
-    '''Modifies the weight of positive literal as per condition given by list lits'''    
+    '''Modifies the weight of positive literal as per condition given by list lits'''
     for lit in lits:
         weights[int(lit)] = 1
         weights[-1*int(lit)] = 0
@@ -193,7 +193,7 @@ class sampler():
         dDNNF = self._cnfFile.split("/")[-1] + ".nnf"
         cmd = "/usr/bin/time -o "+ "/tmp/" + self._cnfFile.split("/")[-1]+".timeout "+ "--verbose d4 /tmp/" + self._cnfFile.split("/")[-1] + ".tmp " + " -out=" + dDNNF
         if(self.isSamplingSetPresent):
-            cmd = "/usr/bin/time -o "+ "/tmp/" + self._cnfFile.split("/")[-1]+".timeout "+ "--verbose Dsharp_PCompile -cs 2000 -pvarsfile "+ "/tmp/" + self._cnfFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + self._cnfFile.split("/")[-1]+".tmp" 
+            cmd = "/usr/bin/time -o "+ "/tmp/" + self._cnfFile.split("/")[-1]+".timeout "+ "--verbose Dsharp_PCompile -cs 2000 -pvarsfile "+ "/tmp/" + self._cnfFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + self._cnfFile.split("/")[-1]+".tmp"
         self._dDNNFfile = dDNNF
         start = time.time()
         os.system(cmd)
@@ -201,7 +201,7 @@ class sampler():
 
     def parse(self,dDNNFfile=None):
         '''Parses the d-DNNF tree to a tree like object
-        
+
         :param dDNNFfile: specifies file containing d-DNNF of the formula to sample from
         '''
         if dDNNFfile:
@@ -235,9 +235,9 @@ class sampler():
                     self.treenodes.append(ornode)
                 nodelen+=1
 
-    def annotate(self, weights={}, conditionVars=[]):
+    def annotate(self, weights={}, conditionVars=[], maximum=False, minimum=False):
         '''Annotates d-DNNF with weights
-        
+
         :param weights: dictionary mapping literals to their weights
         :param conditionVars: list specifying list of literals which should be true in samples
         '''
@@ -247,18 +247,33 @@ class sampler():
         if conditionVars:
             conditionWeights(conditionVars,self.weights)
         elif self.conditionVars:
-            conditionWeights(self.conditionVars, self.weights)     
-        self._annotate(self.treenodes[-1], weights=self.weights)
+            conditionWeights(self.conditionVars, self.weights)
+        self._annotate(self.treenodes[-1], weights=self.weights, maximum=maximum, minimum=minimum)
 
-    def _annotate(self, root, weights={}):
+    def _annotate(self, root, weights={}, maximum=False, minimum=False):
         '''Actually annotates d-DNNF with weights'''
         if(str(root.label)[0] == 'A'):
             root.weight = mpq('1')
-            for ch in root.children: #can perform IBCP for conditioning               
-                root.weight *= self._annotate(ch, weights=weights)
+            for ch in root.children: #can perform IBCP for conditioning.
+                root.weight *= self._annotate(ch, weights=weights, maximum=maximum, minimum=minimum)
             return root.weight
         elif(str(root.label)[0] == 'O'):
-            root.weight = self._annotate(root.children[0], weights=weights) + self._annotate(root.children[1], weights=weights)
+            self._annotate(root.children[0], weights=weights, maximum=maximum, minimum=minimum)
+            self._annotate(root.children[1], weights=weights, maximum=maximum, minimum=minimum)
+            if (maximum and root.children[0].weight >= root.children[1].weight):
+                root.weight = root.children[0].weight
+                root.children[1].weight = 0 #This will help in sampling.
+            elif (maximum and root.children[1].weight > root.children[0].weight):
+                root.weight = root.children[1].weight
+                root.children[0].weight = 0 #This will help in sampling.
+            elif (minimum and root.children[0].weight >= root.children[1].weight):
+                root.weight = root.children[1].weight
+                root.children[0].weight = 0 #This will help in sampling.
+            elif (minimum and root.children[0].weight < root.children[1].weight):
+                root.weight = root.children[0].weight
+                root.children[1].weight = 0 #This will help in sampling.
+            else: #Normal case
+                root.weight = root.children[0].weight + root.children[1].weight
             return root.weight
         else:
             try:
@@ -273,7 +288,7 @@ class sampler():
             except:
                 if (str(root.label)[0] == 'F'):
                     root.weight = 0
-                elif (str(root.label)[0] == 'T'):                    
+                elif (str(root.label)[0] == 'T'):
                     root.weight = 1
             return root.weight
 
@@ -289,7 +304,7 @@ class sampler():
             self._get_samples(root.children[0],np.array(indices[np.where(tosses==1)[0]]))
             self._get_samples(root.children[1],np.array(indices[np.where(tosses==0)[0]]))
         elif(str(root.label)[0] == 'A'):
-            for ch in root.children:       
+            for ch in root.children:
                 self._get_samples(ch,indices)
         else:
             try:
@@ -301,7 +316,7 @@ class sampler():
 
     def sample(self, totalSamples=10, randAssign=True):
         '''Samples totalSamples samples and extends them to all variables if randAssign is set to True
-        
+
         :param totalSamples: Number of samples to be sampled
         :param randAssign: extends each sample to contain all variables from samplingSet'''
         self.samples = []
@@ -347,7 +362,7 @@ class sampler():
 
     def draw(self, drawFile=None):
         '''Draws the tree in png format
-        
+
         :param drawFile: Saves the figure in drawFile in png format
         '''
         self.graph = pydot.Dot(graph_type='digraph')
@@ -356,7 +371,7 @@ class sampler():
 
     def save_annotation_tree(self, filename=None):
         '''Saves annotated d-DNNF in pickle format
-        
+
         :param filename: Saves the annotated d-DNNF by filename'''
         if not filename:
             filename = "default.pkl"
@@ -367,12 +382,12 @@ class sampler():
 
     def load_annotation_tree(self, filename):
         '''Loads Annotation Tree saved by save_annotation_tree()
-        
+
         :param filename: Loads Annotation Tree from filename'''
         fp = open(filename, "rb")
         (self.samplingSet,self.totalVariables,self.treenodes) = pickle.load(fp)
         fp.close()
-        
+
 
 class sampler2():
     '''Main class for main which defines parsing, graph drawing, counting and sampling functions'''
@@ -384,7 +399,7 @@ class sampler2():
         self.samples = None
         self.drawnNodes = {}
         self.isSamplingSetPresent = False
-    
+
     def drawtree(self,root):
         '''Recursively draws tree for the d-DNNF'''
         rootnode = pydot.Node(str(root.label)+" "+str(root.weight))
@@ -429,15 +444,31 @@ class sampler2():
                     self.treenodes.append(ornode)
                 nodelen+=1
 
-    def annotate(self,root, weights = None):
+    def annotate(self,root, weights = None, maximum=False, minimum=False):
         '''Computes Model Counts'''
         if(str(root.label)[0] == 'A'):
             root.weight = mpq('1')
-            for ch in root.children: #can perform IBCP for conditioning               
-                root.weight *= self.annotate(ch, weights=weights)
+            for ch in root.children: #can perform IBCP for conditioning
+                root.weight *= self.annotate(ch, weights=weights, maximum=maximum, minimum=minimum)
             return root.weight
         elif(str(root.label)[0] == 'O'):
-            root.weight = self.annotate(root.children[0], weights=weights) + self.annotate(root.children[1], weights=weights)
+            self.annotate(root.children[0], weights=weights, maximum=maximum, minimum=minimum)
+            self.annotate(root.children[1], weights=weights, maximum=maximum, minimum=minimum)
+            if (maximum and root.children[0].weight >= root.children[1].weight):
+                print("Hey")
+                root.weight = root.children[0].weight
+                root.children[1].weight = 0 #This will help in sampling
+            elif (maximum and root.children[0].weight < root.children[1].weight):
+                root.weight = root.children[1].weight
+                root.children[0].weight = 0 #This will help in sampling
+            elif (minimum and root.children[0].weight <= root.children[1].weight):
+                root.weight = root.children[0].weight
+                root.children[1].weight = 0 #This will help in sampling
+            elif (minimum and root.children[0].weight > root.children[1].weight):
+                root.weight = root.children[1].weight
+                root.children[0].weight = 0 #This will help in sampling
+            else: #This is normal case
+                root.weight = root.children[0].weight + root.children[1].weight
             return root.weight
         else:
             try:
@@ -452,7 +483,7 @@ class sampler2():
             except:
                 if (str(root.label)[0] == 'F'):
                     root.weight = 0
-                elif (str(root.label)[0] == 'T'):                    
+                elif (str(root.label)[0] == 'T'):
                     root.weight = 1
             return root.weight
 
@@ -468,7 +499,7 @@ class sampler2():
             self.getsamples(root.children[0],np.array(indices[np.where(tosses==1)[0]]))
             self.getsamples(root.children[1],np.array(indices[np.where(tosses==0)[0]]))
         elif(str(root.label)[0] == 'A'):
-            for ch in root.children:       
+            for ch in root.children:
                 self.getsamples(ch,indices)
         else:
             try:
@@ -492,6 +523,8 @@ def main():
     parser.add_argument('--dDNNF', type=str, help="specify dDNNF file", dest="dDNNF")
     parser.add_argument('--loadAnnotation', type=str, help="specify filename containing pickle of count annotated dDNNF", dest="loadPickle")
     parser.add_argument('DIMACSCNF', nargs='?', type=str, default="", help='input cnf file')
+    parser.add_argument("--max", action='store_true', help="Calculate the maximum weight of assignment", dest='max')
+    parser.add_argument("--min", action='store_true', help="Calculate the minimum weight of assignment", dest='min')
     args = parser.parse_args()
     if not (args.dDNNF or args.loadPickle or args.DIMACSCNF):
         parser.error("Please give at least one argument out of dDNNF, countPickle and DIMACSCNF")
@@ -501,11 +534,13 @@ def main():
     dDNNF = False
     countPickle = False
     inputFile = False
+    maximum = args.max
+    minimum = args.min
     if args.loadPickle:
         countPickle = args.loadPickle
     else:
         if args.dDNNF:
-            dDNNF = args.dDNNF        
+            dDNNF = args.dDNNF
         if args.DIMACSCNF:
             inputFile = args.DIMACSCNF
     savePickle = args.pickleName
@@ -552,7 +587,7 @@ def main():
             dDNNF = inputFile.split("/")[-1] + ".nnf"
             cmd = "/usr/bin/time -o "+ "/tmp/" + inputFile.split("/")[-1]+".timeout "+ "--verbose ../bin/d4 /tmp/" + inputFile.split("/")[-1] + ".tmp " + " -out=" + dDNNF
             if(sampler.isSamplingSetPresent):
-                cmd = "/usr/bin/time -o "+ "/tmp/" + inputFile.split("/")[-1]+".timeout "+ "--verbose ../bin/Dsharp_PCompile -cs 2000 -pvarsfile "+ "/tmp/" + inputFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + inputFile.split("/")[-1]+".tmp" 
+                cmd = "/usr/bin/time -o "+ "/tmp/" + inputFile.split("/")[-1]+".timeout "+ "--verbose ../bin/Dsharp_PCompile -cs 2000 -pvarsfile "+ "/tmp/" + inputFile.split("/")[-1]+".pvars" +" -Fnnf " + dDNNF + " /tmp/" + inputFile.split("/")[-1]+".tmp"
 
             start = time.time()
             if(os.system(cmd)):
@@ -574,7 +609,7 @@ def main():
             lits = args.conditionVars.split()
             conditionWeights(lits, weights)
         start = time.time()
-        modelcount = sampler.annotate(sampler.treenodes[-1], weights=weights)
+        modelcount = sampler.annotate(sampler.treenodes[-1], weights=weights, maximum=maximum, minimum=minimum)
         sampler.treenodes[-1].models = modelcount
         print("The time taken for Model Counting:", time.time()-start)
         timepickle = time.time()
@@ -596,7 +631,7 @@ def main():
             print("Time taken to save the count annotated dDNNF pickle:", time.time() - timepickle)
     if weights:
         print("Weighted Model Count as per normalised weights limited to var in dDNNF:",mpfr(sampler.treenodes[-1].weight))
-    else:   
+    else:
         print("Model Count limited to var in dDNNF:",mpfr(sampler.treenodes[-1].models))
     if draw:
         sampler.graph = pydot.Dot(graph_type='digraph')
