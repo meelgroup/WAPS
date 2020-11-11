@@ -543,10 +543,12 @@ def main():
     parser.add_argument('DIMACSCNF', nargs='?', type=str, default="", help='input cnf file')
     parser.add_argument("--max", action='store_true', help="Calculate the maximum weight of assignment", dest='max')
     parser.add_argument("--min", action='store_true', help="Calculate the minimum weight of assignment", dest='min')
+    parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator", dest="seed")
     args = parser.parse_args()
     if not (args.dDNNF or args.loadPickle or args.DIMACSCNF):
         parser.error("Please give at least one argument out of dDNNF, countPickle and DIMACSCNF")
     draw = args.figureName
+    random.seed(args.seed)
     totalsamples = args.samples
     randAssignInt = args.randAssign
     dDNNF = False
